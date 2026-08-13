@@ -8,18 +8,21 @@
 
 ## 📖 Overview
 
-In emergent and high-stress situations—such as building fires, natural disasters, or medical emergencies—seconds count. **GuardianAgent** acts as an intelligent emergency copilot. Accessible via web and mobile interfaces, it combines real-time data lookups, visual diagram generation, and direct communication integrations to guide victims to safety while notifying rescue teams and loved ones.
+In emergent and high-stress situations—such as building fires, natural disasters, or medical emergencies—seconds count. **GuardianAgent** acts as an intelligent emergency copilot. Accessible via a modern web interface equipped with voice speech input and one-click SOS alerts, it combines real-time data lookups, visual diagram generation, and direct communication integrations to guide victims to safety while notifying rescue teams and loved ones.
 
 ---
 
 ## ✨ Key Features
 
-- **🚨 First Responder Dispatch & Incident Logging**: Instantly dispatches alerts (mock 911/112 integration) with precise location and emergency details, and records official incident logs in Firestore.
-- **📱 Emergency Contact Alerts**: Automatically sends status updates and location coordinates via SMS/push notifications to designated emergency contacts.
-- **🏃‍♂️ Dynamic Evacuation Route Guidance**: Computes the fastest and safest escape path tailored to current hazard locations, floor layouts, and blocked exits.
+- **🚨 One-Click SOS Emergency Alert**: High-visibility header button (`🚨 SOS ALERT`) that instantly triggers first responder dispatch and sends emergency notifications to designated contacts.
+- **🎙️ Hands-Free Voice Input (Speech-to-Text)**: Integrated Web Speech API microphone control (`🎙️`) for hands-free voice query input during high-stress situations.
+- **💬 Modern Emergency Dialogue Layout**: Clean chat interface featuring distinct user/agent message cards, status light indicators (`🟢 SYSTEM READY`), and quick-action prompt chips.
+- **🚑 First Responder Dispatch & Incident Logging**: Instantly dispatches alerts (mock 911/112 integration) with location and emergency details, recording official logs in Firestore.
+- **📱 Emergency Contact Notifications**: Automatically sends status updates and location coordinates via SMS/push notifications to designated emergency contacts.
+- **🏃 Dynamic Evacuation Route Guidance**: Computes the fastest and safest escape path tailored to current hazard locations, floor layouts, and blocked exits.
 - **🩺 First-Aid & Breathing Procedures**: Provides immediate, actionable first-aid and survival steps using nearby items (e.g., creating makeshift smoke filtration masks from wet cloth).
 - **🌤️ Live Hazard Weather & Smoke Dispersion**: Queries real-time wind speed, wind direction, and weather metrics to assess hazardous smoke or fire spread paths.
-- **🗺️ Visual Emergency Diagram Generation**: Generates custom floorplan escape maps and visual safety illustrations on demand.
+- **🗺️ Visual Emergency Diagram Generation**: Generates custom floorplan escape maps and visual safety illustrations on demand using `gemini-3.1-flash-lite-image`.
 
 ---
 

@@ -1,0 +1,1059 @@
+{
+  "eval_cases": [
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "There is a fire on the 3rd floor outside my office! I am trapped on the 3rd floor, what should I do and can you notify 911 and my emergency contacts?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "🚨 **FIRST RESPONDERS ALERTED:** \n911 / Emergency Services have been dispatched to your location (3rd Floor Office). \n*Dispatch Ref Code:* `k7DkTCwuQVYUPL5POpPj` | *Incident ID:* `NtstVqtpSFgHKTZtLW5v`\n\n---\n\n### **CRITICAL IMMEDIATE ACTIONS**\n\n1. **Check the Door Before Opening:**\n   - Touch the door handle or door with the back of your hand. If it is **hot** or if smoke is pouring in, **DO NOT OPEN IT**.\n\n2. **If Evacuation Path is Accessible:**\n   - **Main Stairwell A is BLOCKED.**\n   - Evacuate via **East Emergency Exit Stairwell B**.\n   - **Crawl low on hands and knees** under the smoke—the air is cleaner near the floor.\n   - Proceed down Stairwell B to **Ground Level Exit 2**.\n\n3. **If You Are Trapped Inside the Office:**\n   - **Seal the door:** Stuff wet towels, clothes, or jackets under the door and vents to block smoke.\n   - **Protect your breathing:** Cover your mouth and nose with a damp cloth or shirt. Take slow, shallow breaths.\n   - **Signal for help:** Go to a window, wave a bright cloth/flashlight, and stay low.\n\n---\n\n### **EMERGENCY CONTACTS**\nPlease reply immediately with the **names or phone numbers of your emergency contacts**, and I will notify them of your exact location and status right away."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "emergency_fire_trapped",
+      "agent_data": {
+        "agents": {
+          "root_agent": {
+            "agent_id": "root_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are GuardianAgent, an Emergency Response & Rescue Assistant. Your mission is to help individuals facing emergencies by fetching live hazard weather (`get_live_hazard_weather`), alerting first responders (`alert_first_responders`), notifying emergency contacts (`notify_contacts`), providing evacuation routes (`get_escape_route`), providing first aid instructions (`get_first_aid_guidance`), querying survival guides from Firestore (`get_emergency_guide`, `list_emergency_guides`), and logging incident reports (`create_incident_report`). Always remain calm, direct, actionable, and prioritize safety.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Fetches real-time weather, wind speed, and wind direction for a location using Open-Meteo.\n\nArgs:\n    location: City name or location string (e.g. 'New York', 'San Francisco', 'Tokyo').\n\nReturns:\n    Dictionary with live temperature (°C), wind speed (km/h), wind direction (degrees), and hazard analysis.",
+                    "name": "get_live_hazard_weather",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Triggers an emergency dispatch alert (911/112 mock integration).\n\nArgs:\n    location: Current address, floor, or GPS coordinates of the caller.\n    emergency_type: Type of emergency (e.g. 'fire', 'medical', 'earthquake').\n    details: Critical situational details (e.g., 'trapped on 3rd floor, heavy smoke').\n\nReturns:\n    Status message with confirmation timestamp and dispatch reference code.",
+                    "name": "alert_first_responders",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "emergency_type": {
+                          "type": "STRING"
+                        },
+                        "details": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location",
+                        "emergency_type",
+                        "details"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Sends SMS/push emergency notification alerts to designated emergency contacts.\n\nArgs:\n    contacts: List of contact names or phone numbers to alert.\n    location: User's current location.\n    status_message: Message to send (e.g. 'I am safe on the east stairwell').\n\nReturns:\n    Confirmation message listing notified contacts.",
+                    "name": "notify_contacts",
+                    "parameters": {
+                      "properties": {
+                        "contacts": {
+                          "items": {
+                            "type": "STRING"
+                          },
+                          "type": "ARRAY"
+                        },
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "status_message": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "contacts",
+                        "location",
+                        "status_message"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Calculates and returns safe evacuation path instructions.\n\nArgs:\n    current_location: Current location/room/floor.\n    hazard_type: Type of hazard ('fire', 'smoke', 'earthquake').\n    exit_status: Status of primary exit ('open', 'blocked').\n\nReturns:\n    Evacuation route steps.",
+                    "name": "get_escape_route",
+                    "parameters": {
+                      "properties": {
+                        "current_location": {
+                          "type": "STRING"
+                        },
+                        "hazard_type": {
+                          "type": "STRING"
+                        },
+                        "exit_status": {
+                          "default": "open",
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "current_location",
+                        "hazard_type"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Provides step-by-step emergency first-aid or breathing instructions.\n\nArgs:\n    condition: Injury/condition ('smoke_inhalation', 'bleeding', 'burns').\n    available_supplies: Optional list of available items (e.g. ['water', 'towel']).\n\nReturns:\n    Instructional first-aid steps.",
+                    "name": "get_first_aid_guidance",
+                    "parameters": {
+                      "properties": {
+                        "condition": {
+                          "type": "STRING"
+                        },
+                        "available_supplies": {
+                          "items": {
+                            "type": "STRING"
+                          },
+                          "type": "ARRAY"
+                        }
+                      },
+                      "required": [
+                        "condition",
+                        "available_supplies"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Reads a specific emergency guide from Firestore database.\n\nArgs:\n    guide_id: ID of the guide (e.g. 'fire_escape', 'smoke_breathing', 'earthquake_safety').\n\nReturns:\n    Dictionary containing emergency guide details or error message.",
+                    "name": "get_emergency_guide",
+                    "parameters": {
+                      "properties": {
+                        "guide_id": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "guide_id"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Lists available emergency guides from Firestore database, optionally filtered by category.\n\nArgs:\n    category: Optional category filter ('evacuation', 'first_aid', etc.).\n\nReturns:\n    List of guide dictionaries.",
+                    "name": "list_emergency_guides",
+                    "parameters": {
+                      "properties": {
+                        "category": {
+                          "default": "",
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Creates a new emergency incident report entry in Firestore.\n\nArgs:\n    location: Current location of the user/incident.\n    emergency_type: Type of emergency (e.g., 'fire', 'medical', 'earthquake').\n    details: Relevant incident description or status details.\n\nReturns:\n    Confirmation message with report document ID.",
+                    "name": "create_incident_report",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "emergency_type": {
+                          "type": "STRING"
+                        },
+                        "details": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location",
+                        "emergency_type",
+                        "details"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_454534",
+                        "args": {
+                          "location": "3rd floor office",
+                          "emergency_type": "fire",
+                          "details": "User trapped on 3rd floor office, heavy fire directly outside office."
+                        },
+                        "name": "alert_first_responders"
+                      }
+                    },
+                    {
+                      "function_call": {
+                        "id": "call_454535",
+                        "args": {
+                          "hazard_type": "fire",
+                          "current_location": "3rd floor office",
+                          "exit_status": "blocked"
+                        },
+                        "name": "get_escape_route"
+                      }
+                    },
+                    {
+                      "function_call": {
+                        "id": "call_454536",
+                        "args": {
+                          "emergency_type": "fire",
+                          "location": "3rd floor office",
+                          "details": "User trapped on 3rd floor office with fire outside office. First responders alerted."
+                        },
+                        "name": "create_incident_report"
+                      }
+                    },
+                    {
+                      "function_call": {
+                        "id": "call_454537",
+                        "args": {
+                          "condition": "smoke_inhalation"
+                        },
+                        "name": "get_first_aid_guidance"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_454534",
+                        "name": "alert_first_responders",
+                        "response": {
+                          "result": "🚨 EMERGENCY ALERT DISPATCHED: First responders notified for location '3rd floor office' (FIRE). Incident Ref: k7DkTCwuQVYUPL5POpPj at 2026-08-13 22:12:31 UTC."
+                        }
+                      }
+                    },
+                    {
+                      "function_response": {
+                        "id": "call_454535",
+                        "name": "get_escape_route",
+                        "response": {
+                          "result": "⚠️ Main Stairwell A is BLOCKED. Evacuate via East Emergency Exit Stairwell B. Crawl low under smoke, proceed down to Ground Level Exit 2."
+                        }
+                      }
+                    },
+                    {
+                      "function_response": {
+                        "id": "call_454536",
+                        "name": "create_incident_report",
+                        "response": {
+                          "result": "Emergency incident reported successfully. Incident ID: NtstVqtpSFgHKTZtLW5v at 2026-08-13T22:12:32.027261+00:00."
+                        }
+                      }
+                    },
+                    {
+                      "function_response": {
+                        "id": "call_454537",
+                        "name": "get_first_aid_guidance",
+                        "response": {
+                          "result": "🫁 Smoke Inhalation Protocol: 1. Moisten cloth/shirt with water if available (Available supplies: none specified). 2. Cover nose and mouth tightly. 3. Crawl on hands and knees near floor where air is clearer. 4. Take slow, shallow breaths."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "🚨 **FIRST RESPONDERS ALERTED:** \n911 / Emergency Services have been dispatched to your location (3rd Floor Office). \n*Dispatch Ref Code:* `k7DkTCwuQVYUPL5POpPj` | *Incident ID:* `NtstVqtpSFgHKTZtLW5v`\n\n---\n\n### **CRITICAL IMMEDIATE ACTIONS**\n\n1. **Check the Door Before Opening:**\n   - Touch the door handle or door with the back of your hand. If it is **hot** or if smoke is pouring in, **DO NOT OPEN IT**.\n\n2. **If Evacuation Path is Accessible:**\n   - **Main Stairwell A is BLOCKED.**\n   - Evacuate via **East Emergency Exit Stairwell B**.\n   - **Crawl low on hands and knees** under the smoke—the air is cleaner near the floor.\n   - Proceed down Stairwell B to **Ground Level Exit 2**.\n\n3. **If You Are Trapped Inside the Office:**\n   - **Seal the door:** Stuff wet towels, clothes, or jackets under the door and vents to block smoke.\n   - **Protect your breathing:** Cover your mouth and nose with a damp cloth or shirt. Take slow, shallow breaths.\n   - **Signal for help:** Go to a window, wave a bright cloth/flashlight, and stay low.\n\n---\n\n### **EMERGENCY CONTACTS**\nPlease reply immediately with the **names or phone numbers of your emergency contacts**, and I will notify them of your exact location and status right away."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "There is smoke everywhere. How can I filter my breathing using surrounding items?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "**IMMEDIATE ACTIONS FOR SMOKE BREATHING:**\n\n1. **GET LOW IMMEDIATELY**  \n   * Crawl on your hands and knees near the floor. Cooler, cleaner air with higher oxygen levels is closest to the ground.\n\n2. **CREATE A DAMP FILTER**  \n   * Take a **cotton shirt, towel, rag, or handkerchief**.  \n   * **Moisten it with water** (or any clean non-flammable liquid) if available. A damp cloth traps smoke particles and soot much better than a dry one.  \n   * If water is unavailable, even a dry cloth or clothing layer held tightly over your mouth and nose is better than nothing.\n\n3. **COVER NOSE AND MOUTH TIGHTLY**  \n   * Press the damp cloth tightly over your mouth and nose to form a seal.\n\n4. **BREATHE SLOWLY**  \n   * Take **slow, shallow breaths** through the wet filter to minimize smoke intake.\n\n---\n\n⚠️ **EVACUATE NOW**\n* Keep moving low toward the nearest exit. \n* Do not use elevators.\n* Feel doors with the back of your hand before opening; if a door is hot, do not open it.\n\n*If you need me to alert emergency responders or calculate an escape route, please reply immediately with your **location/address** and **building details**.*"
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "smoke_inhalation_first_aid",
+      "agent_data": {
+        "agents": {
+          "root_agent": {
+            "agent_id": "root_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are GuardianAgent, an Emergency Response & Rescue Assistant. Your mission is to help individuals facing emergencies by fetching live hazard weather (`get_live_hazard_weather`), alerting first responders (`alert_first_responders`), notifying emergency contacts (`notify_contacts`), providing evacuation routes (`get_escape_route`), providing first aid instructions (`get_first_aid_guidance`), querying survival guides from Firestore (`get_emergency_guide`, `list_emergency_guides`), and logging incident reports (`create_incident_report`). Always remain calm, direct, actionable, and prioritize safety.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Fetches real-time weather, wind speed, and wind direction for a location using Open-Meteo.\n\nArgs:\n    location: City name or location string (e.g. 'New York', 'San Francisco', 'Tokyo').\n\nReturns:\n    Dictionary with live temperature (°C), wind speed (km/h), wind direction (degrees), and hazard analysis.",
+                    "name": "get_live_hazard_weather",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Triggers an emergency dispatch alert (911/112 mock integration).\n\nArgs:\n    location: Current address, floor, or GPS coordinates of the caller.\n    emergency_type: Type of emergency (e.g. 'fire', 'medical', 'earthquake').\n    details: Critical situational details (e.g., 'trapped on 3rd floor, heavy smoke').\n\nReturns:\n    Status message with confirmation timestamp and dispatch reference code.",
+                    "name": "alert_first_responders",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "emergency_type": {
+                          "type": "STRING"
+                        },
+                        "details": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location",
+                        "emergency_type",
+                        "details"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Sends SMS/push emergency notification alerts to designated emergency contacts.\n\nArgs:\n    contacts: List of contact names or phone numbers to alert.\n    location: User's current location.\n    status_message: Message to send (e.g. 'I am safe on the east stairwell').\n\nReturns:\n    Confirmation message listing notified contacts.",
+                    "name": "notify_contacts",
+                    "parameters": {
+                      "properties": {
+                        "contacts": {
+                          "items": {
+                            "type": "STRING"
+                          },
+                          "type": "ARRAY"
+                        },
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "status_message": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "contacts",
+                        "location",
+                        "status_message"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Calculates and returns safe evacuation path instructions.\n\nArgs:\n    current_location: Current location/room/floor.\n    hazard_type: Type of hazard ('fire', 'smoke', 'earthquake').\n    exit_status: Status of primary exit ('open', 'blocked').\n\nReturns:\n    Evacuation route steps.",
+                    "name": "get_escape_route",
+                    "parameters": {
+                      "properties": {
+                        "current_location": {
+                          "type": "STRING"
+                        },
+                        "hazard_type": {
+                          "type": "STRING"
+                        },
+                        "exit_status": {
+                          "default": "open",
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "current_location",
+                        "hazard_type"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Provides step-by-step emergency first-aid or breathing instructions.\n\nArgs:\n    condition: Injury/condition ('smoke_inhalation', 'bleeding', 'burns').\n    available_supplies: Optional list of available items (e.g. ['water', 'towel']).\n\nReturns:\n    Instructional first-aid steps.",
+                    "name": "get_first_aid_guidance",
+                    "parameters": {
+                      "properties": {
+                        "condition": {
+                          "type": "STRING"
+                        },
+                        "available_supplies": {
+                          "items": {
+                            "type": "STRING"
+                          },
+                          "type": "ARRAY"
+                        }
+                      },
+                      "required": [
+                        "condition",
+                        "available_supplies"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Reads a specific emergency guide from Firestore database.\n\nArgs:\n    guide_id: ID of the guide (e.g. 'fire_escape', 'smoke_breathing', 'earthquake_safety').\n\nReturns:\n    Dictionary containing emergency guide details or error message.",
+                    "name": "get_emergency_guide",
+                    "parameters": {
+                      "properties": {
+                        "guide_id": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "guide_id"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Lists available emergency guides from Firestore database, optionally filtered by category.\n\nArgs:\n    category: Optional category filter ('evacuation', 'first_aid', etc.).\n\nReturns:\n    List of guide dictionaries.",
+                    "name": "list_emergency_guides",
+                    "parameters": {
+                      "properties": {
+                        "category": {
+                          "default": "",
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Creates a new emergency incident report entry in Firestore.\n\nArgs:\n    location: Current location of the user/incident.\n    emergency_type: Type of emergency (e.g., 'fire', 'medical', 'earthquake').\n    details: Relevant incident description or status details.\n\nReturns:\n    Confirmation message with report document ID.",
+                    "name": "create_incident_report",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "emergency_type": {
+                          "type": "STRING"
+                        },
+                        "details": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location",
+                        "emergency_type",
+                        "details"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_411246",
+                        "args": {
+                          "condition": "smoke_inhalation"
+                        },
+                        "name": "get_first_aid_guidance"
+                      }
+                    },
+                    {
+                      "function_call": {
+                        "id": "call_411247",
+                        "args": {
+                          "guide_id": "smoke_breathing"
+                        },
+                        "name": "get_emergency_guide"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_411246",
+                        "name": "get_first_aid_guidance",
+                        "response": {
+                          "result": "🫁 Smoke Inhalation Protocol: 1. Moisten cloth/shirt with water if available (Available supplies: none specified). 2. Cover nose and mouth tightly. 3. Crawl on hands and knees near floor where air is clearer. 4. Take slow, shallow breaths."
+                        }
+                      }
+                    },
+                    {
+                      "function_response": {
+                        "id": "call_411247",
+                        "name": "get_emergency_guide",
+                        "response": {
+                          "id": "smoke_breathing",
+                          "severity_level": "CRITICAL",
+                          "title": "Smoke Inhalation Protection & Filter Masking",
+                          "steps": [
+                            "Moisten clean cotton cloth or shirt with water.",
+                            "Secure tightly over nose and mouth.",
+                            "Crawl on hands and knees near floor where oxygen concentration is highest.",
+                            "Take shallow, slow breaths through the wet filter."
+                          ],
+                          "category": "first_aid",
+                          "supplies_needed": [
+                            "Water",
+                            "Cotton cloth / towel / shirt"
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "**IMMEDIATE ACTIONS FOR SMOKE BREATHING:**\n\n1. **GET LOW IMMEDIATELY**  \n   * Crawl on your hands and knees near the floor. Cooler, cleaner air with higher oxygen levels is closest to the ground.\n\n2. **CREATE A DAMP FILTER**  \n   * Take a **cotton shirt, towel, rag, or handkerchief**.  \n   * **Moisten it with water** (or any clean non-flammable liquid) if available. A damp cloth traps smoke particles and soot much better than a dry one.  \n   * If water is unavailable, even a dry cloth or clothing layer held tightly over your mouth and nose is better than nothing.\n\n3. **COVER NOSE AND MOUTH TIGHTLY**  \n   * Press the damp cloth tightly over your mouth and nose to form a seal.\n\n4. **BREATHE SLOWLY**  \n   * Take **slow, shallow breaths** through the wet filter to minimize smoke intake.\n\n---\n\n⚠️ **EVACUATE NOW**\n* Keep moving low toward the nearest exit. \n* Do not use elevators.\n* Feel doors with the back of your hand before opening; if a door is hot, do not open it.\n\n*If you need me to alert emergency responders or calculate an escape route, please reply immediately with your **location/address** and **building details**.*"
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "What emergency evacuation guides do you have available?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "We have the following emergency guides available:\n\n---\n\n### **Evacuation Guides**\n\n1. **Building Fire Evacuation Protocol**\n   * **Guide ID:** `fire_escape`\n   * **Severity Level:** CRITICAL\n   * **Key Steps:**\n     * Stay low to the ground below toxic smoke.\n     * Check door handles for heat before opening.\n     * Place a wet fabric or towel over your nose and mouth.\n     * Proceed to the primary fire exit or stairwell (**do not use elevators**).\n     * Once safe outside, alert emergency services immediately.\n   * **Recommended Supplies:** Wet cloth/towel, phone flashlight.\n\n2. **Earthquake Shelter & Evacuation Protocol**\n   * **Guide ID:** `earthquake_safety`\n   * **Severity Level:** HIGH\n   * **Key Steps:**\n     * Drop onto hands and knees under a heavy desk or table.\n     * Cover head and neck with one arm.\n     * Hold on firmly to shelter until shaking stops.\n     * Keep clear of glass, overhead fixtures, and exterior walls.\n   * **Recommended Supplies:** Heavy table/desk, arm/pillow head protection.\n\n---\n\n### **First Aid & Survival Guides**\n\n3. **Smoke Inhalation Protection & Filter Masking**\n   * **Guide ID:** `smoke_breathing`\n   * **Severity Level:** CRITICAL\n   * **Key Steps:**\n     * Moisten a clean cotton cloth or shirt with water.\n     * Secure tightly over your nose and mouth.\n     * Crawl on hands and knees near the floor where air quality is better.\n     * Take shallow, slow breaths through the wet filter.\n   * **Recommended Supplies:** Water, cotton cloth/towel/shirt.\n\n---\n\n### **How I Can Assist You Right Now:**\n* **Tailored Evacuation Route:** Provide your current location and hazard type, and I will generate customized step-by-step escape instructions.\n* **Alert First Responders:** Dispatch emergency services if you are in immediate danger.\n* **Notify Contacts:** Send your status and location to emergency contacts."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "list_evacuation_guides",
+      "agent_data": {
+        "agents": {
+          "root_agent": {
+            "agent_id": "root_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are GuardianAgent, an Emergency Response & Rescue Assistant. Your mission is to help individuals facing emergencies by fetching live hazard weather (`get_live_hazard_weather`), alerting first responders (`alert_first_responders`), notifying emergency contacts (`notify_contacts`), providing evacuation routes (`get_escape_route`), providing first aid instructions (`get_first_aid_guidance`), querying survival guides from Firestore (`get_emergency_guide`, `list_emergency_guides`), and logging incident reports (`create_incident_report`). Always remain calm, direct, actionable, and prioritize safety.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Fetches real-time weather, wind speed, and wind direction for a location using Open-Meteo.\n\nArgs:\n    location: City name or location string (e.g. 'New York', 'San Francisco', 'Tokyo').\n\nReturns:\n    Dictionary with live temperature (°C), wind speed (km/h), wind direction (degrees), and hazard analysis.",
+                    "name": "get_live_hazard_weather",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Triggers an emergency dispatch alert (911/112 mock integration).\n\nArgs:\n    location: Current address, floor, or GPS coordinates of the caller.\n    emergency_type: Type of emergency (e.g. 'fire', 'medical', 'earthquake').\n    details: Critical situational details (e.g., 'trapped on 3rd floor, heavy smoke').\n\nReturns:\n    Status message with confirmation timestamp and dispatch reference code.",
+                    "name": "alert_first_responders",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "emergency_type": {
+                          "type": "STRING"
+                        },
+                        "details": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location",
+                        "emergency_type",
+                        "details"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Sends SMS/push emergency notification alerts to designated emergency contacts.\n\nArgs:\n    contacts: List of contact names or phone numbers to alert.\n    location: User's current location.\n    status_message: Message to send (e.g. 'I am safe on the east stairwell').\n\nReturns:\n    Confirmation message listing notified contacts.",
+                    "name": "notify_contacts",
+                    "parameters": {
+                      "properties": {
+                        "contacts": {
+                          "items": {
+                            "type": "STRING"
+                          },
+                          "type": "ARRAY"
+                        },
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "status_message": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "contacts",
+                        "location",
+                        "status_message"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Calculates and returns safe evacuation path instructions.\n\nArgs:\n    current_location: Current location/room/floor.\n    hazard_type: Type of hazard ('fire', 'smoke', 'earthquake').\n    exit_status: Status of primary exit ('open', 'blocked').\n\nReturns:\n    Evacuation route steps.",
+                    "name": "get_escape_route",
+                    "parameters": {
+                      "properties": {
+                        "current_location": {
+                          "type": "STRING"
+                        },
+                        "hazard_type": {
+                          "type": "STRING"
+                        },
+                        "exit_status": {
+                          "default": "open",
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "current_location",
+                        "hazard_type"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Provides step-by-step emergency first-aid or breathing instructions.\n\nArgs:\n    condition: Injury/condition ('smoke_inhalation', 'bleeding', 'burns').\n    available_supplies: Optional list of available items (e.g. ['water', 'towel']).\n\nReturns:\n    Instructional first-aid steps.",
+                    "name": "get_first_aid_guidance",
+                    "parameters": {
+                      "properties": {
+                        "condition": {
+                          "type": "STRING"
+                        },
+                        "available_supplies": {
+                          "items": {
+                            "type": "STRING"
+                          },
+                          "type": "ARRAY"
+                        }
+                      },
+                      "required": [
+                        "condition",
+                        "available_supplies"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Reads a specific emergency guide from Firestore database.\n\nArgs:\n    guide_id: ID of the guide (e.g. 'fire_escape', 'smoke_breathing', 'earthquake_safety').\n\nReturns:\n    Dictionary containing emergency guide details or error message.",
+                    "name": "get_emergency_guide",
+                    "parameters": {
+                      "properties": {
+                        "guide_id": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "guide_id"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Lists available emergency guides from Firestore database, optionally filtered by category.\n\nArgs:\n    category: Optional category filter ('evacuation', 'first_aid', etc.).\n\nReturns:\n    List of guide dictionaries.",
+                    "name": "list_emergency_guides",
+                    "parameters": {
+                      "properties": {
+                        "category": {
+                          "default": "",
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Creates a new emergency incident report entry in Firestore.\n\nArgs:\n    location: Current location of the user/incident.\n    emergency_type: Type of emergency (e.g., 'fire', 'medical', 'earthquake').\n    details: Relevant incident description or status details.\n\nReturns:\n    Confirmation message with report document ID.",
+                    "name": "create_incident_report",
+                    "parameters": {
+                      "properties": {
+                        "location": {
+                          "type": "STRING"
+                        },
+                        "emergency_type": {
+                          "type": "STRING"
+                        },
+                        "details": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "location",
+                        "emergency_type",
+                        "details"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_465282",
+                        "args": {
+                          "category": "evacuation"
+                        },
+                        "name": "list_emergency_guides"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_465282",
+                        "name": "list_emergency_guides",
+                        "response": {
+                          "result": [
+                            {
+                              "id": "earthquake_safety",
+                              "severity_level": "HIGH",
+                              "title": "Earthquake Shelter & Protocol",
+                              "steps": [
+                                "Drop onto hands and knees under heavy desk or table.",
+                                "Cover head and neck with one arm.",
+                                "Hold on firmly to shelter until shaking stops.",
+                                "Keep clear of glass, overhead fixtures, and exterior walls."
+                              ],
+                              "category": "evacuation",
+                              "supplies_needed": [
+                                "Heavy table/desk",
+                                "Arm/Pillow head protection"
+                              ]
+                            },
+                            {
+                              "id": "fire_escape",
+                              "severity_level": "CRITICAL",
+                              "title": "Building Fire Evacuation Protocol",
+                              "steps": [
+                                "Stay low to the ground below toxic smoke.",
+                                "Check door handles for heat before opening.",
+                                "Place wet fabric/towel over nose and mouth.",
+                                "Proceed to primary fire exit/stairwell. Do NOT use elevators.",
+                                "Once safe outside, alert 911 dispatch immediately."
+                              ],
+                              "category": "evacuation",
+                              "supplies_needed": [
+                                "Wet cloth or towel",
+                                "Phone flashlight"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_461313",
+                        "args": {
+                          "category": ""
+                        },
+                        "name": "list_emergency_guides"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_461313",
+                        "name": "list_emergency_guides",
+                        "response": {
+                          "result": [
+                            {
+                              "id": "earthquake_safety",
+                              "severity_level": "HIGH",
+                              "title": "Earthquake Shelter & Protocol",
+                              "steps": [
+                                "Drop onto hands and knees under heavy desk or table.",
+                                "Cover head and neck with one arm.",
+                                "Hold on firmly to shelter until shaking stops.",
+                                "Keep clear of glass, overhead fixtures, and exterior walls."
+                              ],
+                              "category": "evacuation",
+                              "supplies_needed": [
+                                "Heavy table/desk",
+                                "Arm/Pillow head protection"
+                              ]
+                            },
+                            {
+                              "id": "fire_escape",
+                              "severity_level": "CRITICAL",
+                              "title": "Building Fire Evacuation Protocol",
+                              "steps": [
+                                "Stay low to the ground below toxic smoke.",
+                                "Check door handles for heat before opening.",
+                                "Place wet fabric/towel over nose and mouth.",
+                                "Proceed to primary fire exit/stairwell. Do NOT use elevators.",
+                                "Once safe outside, alert 911 dispatch immediately."
+                              ],
+                              "category": "evacuation",
+                              "supplies_needed": [
+                                "Wet cloth or towel",
+                                "Phone flashlight"
+                              ]
+                            },
+                            {
+                              "id": "smoke_breathing",
+                              "severity_level": "CRITICAL",
+                              "title": "Smoke Inhalation Protection & Filter Masking",
+                              "steps": [
+                                "Moisten clean cotton cloth or shirt with water.",
+                                "Secure tightly over nose and mouth.",
+                                "Crawl on hands and knees near floor where oxygen concentration is highest.",
+                                "Take shallow, slow breaths through the wet filter."
+                              ],
+                              "category": "first_aid",
+                              "supplies_needed": [
+                                "Water",
+                                "Cotton cloth / towel / shirt"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "We have the following emergency guides available:\n\n---\n\n### **Evacuation Guides**\n\n1. **Building Fire Evacuation Protocol**\n   * **Guide ID:** `fire_escape`\n   * **Severity Level:** CRITICAL\n   * **Key Steps:**\n     * Stay low to the ground below toxic smoke.\n     * Check door handles for heat before opening.\n     * Place a wet fabric or towel over your nose and mouth.\n     * Proceed to the primary fire exit or stairwell (**do not use elevators**).\n     * Once safe outside, alert emergency services immediately.\n   * **Recommended Supplies:** Wet cloth/towel, phone flashlight.\n\n2. **Earthquake Shelter & Evacuation Protocol**\n   * **Guide ID:** `earthquake_safety`\n   * **Severity Level:** HIGH\n   * **Key Steps:**\n     * Drop onto hands and knees under a heavy desk or table.\n     * Cover head and neck with one arm.\n     * Hold on firmly to shelter until shaking stops.\n     * Keep clear of glass, overhead fixtures, and exterior walls.\n   * **Recommended Supplies:** Heavy table/desk, arm/pillow head protection.\n\n---\n\n### **First Aid & Survival Guides**\n\n3. **Smoke Inhalation Protection & Filter Masking**\n   * **Guide ID:** `smoke_breathing`\n   * **Severity Level:** CRITICAL\n   * **Key Steps:**\n     * Moisten a clean cotton cloth or shirt with water.\n     * Secure tightly over your nose and mouth.\n     * Crawl on hands and knees near the floor where air quality is better.\n     * Take shallow, slow breaths through the wet filter.\n   * **Recommended Supplies:** Water, cotton cloth/towel/shirt.\n\n---\n\n### **How I Can Assist You Right Now:**\n* **Tailored Evacuation Route:** Provide your current location and hazard type, and I will generate customized step-by-step escape instructions.\n* **Alert First Responders:** Dispatch emergency services if you are in immediate danger.\n* **Notify Contacts:** Send your status and location to emergency contacts."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

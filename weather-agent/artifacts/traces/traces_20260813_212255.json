@@ -1,0 +1,403 @@
+{
+  "eval_cases": [
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "What is the weather like in Tokyo?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "The weather in Tokyo is currently clear with a temperature of 22°C (72°F) and a gentle breeze."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "tokyo_weather",
+      "agent_data": {
+        "agents": {
+          "root_agent": {
+            "agent_id": "root_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are a helpful Weather & Time Assistant. Use the provided tools to answer questions about weather and current local time accurately.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Gets weather information for a specified city.\n\nArgs:\n    city: The name of the city to get weather for.\n\nReturns:\n    Weather report string.",
+                    "name": "get_weather",
+                    "parameters": {
+                      "properties": {
+                        "city": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "city"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Gets the current time for a specified city.\n\nArgs:\n    city: The name of the city to get current time for.\n\nReturns:\n    Current time string formatted with timezone.",
+                    "name": "get_current_time",
+                    "parameters": {
+                      "properties": {
+                        "city": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "city"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_499669",
+                        "args": {
+                          "city": "Tokyo"
+                        },
+                        "name": "get_weather"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_499669",
+                        "name": "get_weather",
+                        "response": {
+                          "result": "Tokyo: 22°C (72°F), Clear skies with a gentle breeze."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "The weather in Tokyo is currently clear with a temperature of 22°C (72°F) and a gentle breeze."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "What time is it in London right now?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "The current time in London is 10:24 PM (BST)."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "london_time",
+      "agent_data": {
+        "agents": {
+          "root_agent": {
+            "agent_id": "root_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are a helpful Weather & Time Assistant. Use the provided tools to answer questions about weather and current local time accurately.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Gets weather information for a specified city.\n\nArgs:\n    city: The name of the city to get weather for.\n\nReturns:\n    Weather report string.",
+                    "name": "get_weather",
+                    "parameters": {
+                      "properties": {
+                        "city": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "city"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Gets the current time for a specified city.\n\nArgs:\n    city: The name of the city to get current time for.\n\nReturns:\n    Current time string formatted with timezone.",
+                    "name": "get_current_time",
+                    "parameters": {
+                      "properties": {
+                        "city": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "city"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_431370",
+                        "args": {
+                          "city": "London"
+                        },
+                        "name": "get_current_time"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_431370",
+                        "name": "get_current_time",
+                        "response": {
+                          "result": "The current time in London is 10:24 PM (BST)."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "The current time in London is 10:24 PM (BST)."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "What is the weather and current time in Paris?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "In Paris, the weather is currently 20°C (68°F) and partly cloudy. The local time is 11:24 PM (CEST)."
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "paris_weather_and_time",
+      "agent_data": {
+        "agents": {
+          "root_agent": {
+            "agent_id": "root_agent",
+            "agent_type": "LlmAgent",
+            "description": "",
+            "instruction": "You are a helpful Weather & Time Assistant. Use the provided tools to answer questions about weather and current local time accurately.",
+            "tools": [
+              {
+                "function_declarations": [
+                  {
+                    "description": "Gets weather information for a specified city.\n\nArgs:\n    city: The name of the city to get weather for.\n\nReturns:\n    Weather report string.",
+                    "name": "get_weather",
+                    "parameters": {
+                      "properties": {
+                        "city": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "city"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              },
+              {
+                "function_declarations": [
+                  {
+                    "description": "Gets the current time for a specified city.\n\nArgs:\n    city: The name of the city to get current time for.\n\nReturns:\n    Current time string formatted with timezone.",
+                    "name": "get_current_time",
+                    "parameters": {
+                      "properties": {
+                        "city": {
+                          "type": "STRING"
+                        }
+                      },
+                      "required": [
+                        "city"
+                      ],
+                      "type": "OBJECT"
+                    }
+                  }
+                ]
+              }
+            ],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "call_391630",
+                        "args": {
+                          "city": "Paris"
+                        },
+                        "name": "get_weather"
+                      }
+                    },
+                    {
+                      "function_call": {
+                        "id": "call_391631",
+                        "args": {
+                          "city": "Paris"
+                        },
+                        "name": "get_current_time"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "call_391630",
+                        "name": "get_weather",
+                        "response": {
+                          "result": "Paris: 20°C (68°F), Partly cloudy."
+                        }
+                      }
+                    },
+                    {
+                      "function_response": {
+                        "id": "call_391631",
+                        "name": "get_current_time",
+                        "response": {
+                          "result": "The current time in Paris is 11:24 PM (CEST)."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "root_agent",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "In Paris, the weather is currently 20°C (68°F) and partly cloudy. The local time is 11:24 PM (CEST)."
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

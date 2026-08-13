@@ -1,0 +1,25 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "tokyo_weather",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "What is the weather like in Tokyo?"}]
+      }
+    },
+    {
+      "eval_case_id": "london_time",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "What time is it in London right now?"}]
+      }
+    },
+    {
+      "eval_case_id": "paris_weather_and_time",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "What is the weather and current time in Paris?"}]
+      }
+    }
+  ]
+}

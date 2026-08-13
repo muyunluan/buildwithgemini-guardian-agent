@@ -1,0 +1,25 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "emergency_fire_trapped",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "There is a fire on the 3rd floor outside my office! I am trapped on the 3rd floor, what should I do and can you notify 911 and my emergency contacts?"}]
+      }
+    },
+    {
+      "eval_case_id": "smoke_inhalation_first_aid",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "There is smoke everywhere. How can I filter my breathing using surrounding items?"}]
+      }
+    },
+    {
+      "eval_case_id": "list_evacuation_guides",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "What emergency evacuation guides do you have available?"}]
+      }
+    }
+  ]
+}
